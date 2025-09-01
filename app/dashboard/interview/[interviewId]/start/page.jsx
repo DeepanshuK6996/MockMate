@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import QuestionSection from './_components/QuestionSection';
 import RecordAnswerSection from './_components/RecordAnswerSection';
+import useSpeechToText from 'react-hook-speech-to-text';
 
 function page() {
 
@@ -13,6 +14,18 @@ function page() {
     const [interviewData, setInterviewData] = useState(null);
     const [mockInterviewQuestions, setMockInterviewQuestions] = useState();
     const [activeQuestion, setActiveQuestion] = useState(0);
+
+     const {
+       error,
+       interimResult,
+       isRecording,
+       results,
+       startSpeechToText,
+       stopSpeechToText,
+     } = useSpeechToText({
+       continuous: true,
+       useLegacyResults: false,
+     });
   
     const getInterviewDetails = async () => {
       if (!interviewId) return;
@@ -40,11 +53,20 @@ function page() {
         <QuestionSection 
           mockInterviewQuestions={mockInterviewQuestions} 
           activeQuestion={activeQuestion} 
+          results={results}
+          interimResult={interimResult}
         />
 
         {/* video/audio */}
-        <RecordAnswerSection/>
-        
+        <RecordAnswerSection
+          isRecording={isRecording}
+          startSpeechToText={startSpeechToText}
+          stopSpeechToText={stopSpeechToText}
+          error={error}
+          results={results}          // ✅ pass results
+          interimResult={interimResult}
+        />
+
       </div>
     </div>
   )

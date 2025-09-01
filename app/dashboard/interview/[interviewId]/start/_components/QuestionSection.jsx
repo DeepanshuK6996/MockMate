@@ -1,22 +1,22 @@
 import { Lightbulb, Volume, Volume1, Volume1Icon, Volume2, Volume2Icon } from 'lucide-react'
 import React from 'react'
-import useSpeechToText from 'react-hook-speech-to-text';
+//import useSpeechToText from 'react-hook-speech-to-text';
 
-function QuestionSection({mockInterviewQuestions, activeQuestion}) {
+function QuestionSection({mockInterviewQuestions, activeQuestion, results, interimResult}) {
 
-  const {
-      error,
-      interimResult,
-      isRecording,
-      results,
-      startSpeechToText,
-      stopSpeechToText,
-    } = useSpeechToText({
-      continuous: true,
-      useLegacyResults: false
-    });
+  // const {
+  //     error,
+  //     interimResult,
+  //     isRecording,
+  //     results,
+  //     startSpeechToText,
+  //     stopSpeechToText,
+  //   } = useSpeechToText({
+  //     continuous: true,
+  //     useLegacyResults: false
+  //   });
   
-    if (error) return <p>Web Speech API is not available in this browser 🤷‍</p>;
+    // if (error) return <p>Web Speech API is not available in this browser 🤷‍</p>;
 
 
     const textToSpeech = (text) => {
