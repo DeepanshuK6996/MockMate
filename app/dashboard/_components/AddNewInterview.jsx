@@ -19,6 +19,7 @@ import { db } from '@/utils/db';
 import { MockInterview } from '@/utils/schema';
 import { v4 as uuidv4 } from 'uuid';
 import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 
 function AddNewInterview() {
     
@@ -28,6 +29,8 @@ function AddNewInterview() {
     const [jobExperience, setJobExperience] = useState(0);
     const [loading, setLoading] = useState(false);
     const [quesJsonResponse, setQuesJsonResponse] = useState([]);
+
+    const router = useRouter();
     const {user} = useUser();
 
     const onSubmit = async (e) => {
@@ -52,6 +55,11 @@ function AddNewInterview() {
             }).returning({mockId: MockInterview.mockId});
             
             console.log("Inserted ID: ",reponse);
+
+            if(reponse){
+              setOpenDailog(false);
+              router.push('/dashboard/interview/'+reponse[0]?.mockId);
+            }
           }
           
         } catch (err) {
