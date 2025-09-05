@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react'
 import QuestionSection from './_components/QuestionSection';
 import RecordAnswerSection from './_components/RecordAnswerSection';
 import useSpeechToText from 'react-hook-speech-to-text';
+import { Button } from '@/components/ui/button';
 
 function page() {
 
@@ -59,6 +60,10 @@ function page() {
 
         {/* video/audio */}
         <RecordAnswerSection
+          mockInterviewQuestions={mockInterviewQuestions} 
+          activeQuestion={activeQuestion} 
+          interviewData={interviewData}
+          
           isRecording={isRecording}
           startSpeechToText={startSpeechToText}
           stopSpeechToText={stopSpeechToText}
@@ -66,6 +71,31 @@ function page() {
           results={results}          // ✅ pass results
           interimResult={interimResult}
         />
+
+      </div>
+
+      <div className='flex justify-end gap-6'>
+        {activeQuestion > 0 && 
+          <Button className="cursor-pointer"
+            onClick={() => setActiveQuestion(activeQuestion - 1)}
+          >
+            Previous Question
+          </Button>
+        }
+
+        {activeQuestion != mockInterviewQuestions?.length - 1 && 
+          <Button className="cursor-pointer"
+            onClick={() => setActiveQuestion(activeQuestion + 1)}
+          >
+            Next Question
+          </Button>
+        }
+
+        {activeQuestion == mockInterviewQuestions?.length - 1 && 
+          <Button className="cursor-pointer">
+            End Interview
+          </Button>
+        }
 
       </div>
     </div>

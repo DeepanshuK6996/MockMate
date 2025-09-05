@@ -4,28 +4,18 @@ import React, { useEffect, useState } from 'react'
 import Webcam from 'react-webcam'
 //import useSpeechToText from 'react-hook-speech-to-text';
 import { Mic } from 'lucide-react';
+import { toast } from 'sonner';
+import { evaluateAnswer } from '@/utils/GeminiAnswerEvaluator';
+import { UserAnswer } from '@/utils/schema';
+import { useUser } from '@clerk/nextjs';
+import { db } from '@/utils/db';
 
-function RecordAnswerSection({ isRecording, startSpeechToText, stopSpeechToText, error, results, interimResult }) {
+function RecordAnswerSection({mockInterviewQuestions, activeQuestion, interviewData, isRecording, startSpeechToText, stopSpeechToText, error, results, interimResult, clearTranscript}) {
 
     const [userAnswer, setUserAnswer] = useState('');
+    const {user} = useUser();
+    const [loading, setLoading] = useState(false);
 
-//     const {
-//     error,
-//     interimResult,
-//     isRecording,
-//     results,
-//     startSpeechToText,
-//     stopSpeechToText,
-//   } = useSpeechToText({
-//     continuous: true,
-//     useLegacyResults: false
-//   });
-
-    // useEffect(() => {
-    //  results.map((result) => (
-    //     setUserAnswer(prevAns => prevAns + result.transcript)
-    //  ))
-    // }, [results])
     useEffect(() => {
       if (results.length > 0) {
         const lastResult = results[results.length - 1].transcript;
@@ -33,13 +23,46 @@ function RecordAnswerSection({ isRecording, startSpeechToText, stopSpeechToText,
       }
     }, [results]);
 
-    
+    const saveUserAnswer = async () => {
+      if(isRecording){
+        setLoading(true)
+        stopSpeechToText()
+
+        const result = await evaluateAnswer({
+          question: mockInterviewQuestions[activeQuestion]?.question, 
+          userAnswer: userAnswer});
+          
+          //console.log(result);
+          //console.log(JSON.parse(result)); // This will log the JSON string returned by Gemini
+          const jsonFeedback = JSON.parse(result);
+
+          const resp = await db.insert(UserAnswer).values({
+            mockIdRef : interviewData?.mockId,
+            question : mockInterviewQuestions[activeQuestion]?.question, 
+            correctAns : mockInterviewQuestions[activeQuestion]?.answer,
+            userAns : userAnswer,
+            feedback : jsonFeedback?.feedback,
+            rating: jsonFeedback?.rating,
+            userEmail : user?.primaryEmailAddress.emailAddress, 
+            createdAt: new Date().toISOString().split("T")[0],
+          })
+
+          if(resp){
+            toast("User Answer recorded successfully")
+          }
+          setUserAnswer('');
+          setLoading(false);
+
+      }else{
+        startSpeechToText()
+      }
+    }
 
   if (error) return <p>Web Speech API is not available in this browser 🤷‍</p>;
 
   return (
-    <div className='flex flex-col justify-between '>
-      <div className="flex flex-col mt-20 justify-center items-center bg-secondary rounded-lg p-5">
+    <div className='flex flex-col items-center'>
+      <div className="flex flex-col mt-20 justify-center w-full items-center bg-secondary rounded-lg p-5">
         <Image
           src={"/webIcon.png"}
           height={200}
@@ -58,8 +81,10 @@ function RecordAnswerSection({ isRecording, startSpeechToText, stopSpeechToText,
         />
       </div>
 
-      <Button className="my-10 cursor-pointer mx-50"
-            onClick={isRecording ? stopSpeechToText : startSpeechToText} >
+      <Button 
+            disabled={loading}
+            className="my-10 cursor-pointer mx-50"
+            onClick={saveUserAnswer} >
             {isRecording ? 
                 <h2 className='flex text-center items-center text-red-600'>
                     <Mic/>  Recording....

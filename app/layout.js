@@ -8,6 +8,7 @@ import {
   SignedOut,
   UserButton,
 } from '@clerk/nextjs'
+import { Toaster } from "@/components/ui/sonner"
 
 export const metadata = {
   title: "MockMate",
@@ -25,6 +26,7 @@ export default function RootLayout({ children }) {
     <ClerkProvider>
       <html lang="en">
         <body className={outfit.className}>
+          <Toaster />
           {children}
         </body>
       </html>
