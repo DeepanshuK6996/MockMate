@@ -8,6 +8,7 @@ import QuestionSection from './_components/QuestionSection';
 import RecordAnswerSection from './_components/RecordAnswerSection';
 import useSpeechToText from 'react-hook-speech-to-text';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 function page() {
 
@@ -23,6 +24,7 @@ function page() {
        results,
        startSpeechToText,
        stopSpeechToText,
+       setResults,
      } = useSpeechToText({
        continuous: true,
        useLegacyResults: false,
@@ -70,6 +72,7 @@ function page() {
           error={error}
           results={results}          // ✅ pass results
           interimResult={interimResult}
+          setResults={setResults}
         />
 
       </div>
@@ -92,9 +95,12 @@ function page() {
         }
 
         {activeQuestion == mockInterviewQuestions?.length - 1 && 
-          <Button className="cursor-pointer">
-            End Interview
-          </Button>
+          <Link href={'/dashboard/interview/'+interviewData?.mockId+'/feedback'}>
+            <Button className="cursor-pointer">
+              End Interview
+            </Button>
+          </Link>
+          
         }
 
       </div>

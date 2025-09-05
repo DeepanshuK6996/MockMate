@@ -10,7 +10,7 @@ import { UserAnswer } from '@/utils/schema';
 import { useUser } from '@clerk/nextjs';
 import { db } from '@/utils/db';
 
-function RecordAnswerSection({mockInterviewQuestions, activeQuestion, interviewData, isRecording, startSpeechToText, stopSpeechToText, error, results, interimResult, clearTranscript}) {
+function RecordAnswerSection({mockInterviewQuestions, activeQuestion, interviewData, isRecording, startSpeechToText, stopSpeechToText, error, results, interimResult, setResults}) {
 
     const [userAnswer, setUserAnswer] = useState('');
     const {user} = useUser();
@@ -49,10 +49,10 @@ function RecordAnswerSection({mockInterviewQuestions, activeQuestion, interviewD
 
           if(resp){
             toast("User Answer recorded successfully")
+            setUserAnswer('');
+            setLoading(false);
+            setResults([]);
           }
-          setUserAnswer('');
-          setLoading(false);
-
       }else{
         startSpeechToText()
       }
