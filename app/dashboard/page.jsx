@@ -1,17 +1,35 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useUser } from '@clerk/nextjs'
 import AddNewInterview from './_components/AddNewInterview';
 import EmptyState from './_components/EmptyState';
+import InterviewList from './_components/InterviewList';
+import { db } from '@/utils/db';
+import { desc, eq } from 'drizzle-orm';
+import { MockInterview } from '@/utils/schema';
 
 function Dashboard() {
   const {user} = useUser();
   const [interviewList, setInterviewList] = useState([]);
 
+  const getInterviewList = async () => {
+    const result = await db
+      .select()
+      .from(MockInterview)
+      .where(
+        eq(MockInterview.createdBy, user?.primaryEmailAddress.emailAddress)
+      )
+      .orderBy(desc(MockInterview.id));
+
+    console.log(result);
+    setInterviewList(result);
+  };
+
+  useEffect(() => {
+    user && getInterviewList();
+  }, [user]);
+
   return (
-    // <div className='p-10'>
-    //   <h2 className='font-bold text-2xl'>Dashboard</h2>
-    // </div>
     <div className='py-20 px-10 md:px-28 lg:px-44 xl:px-56'>
     
         <div className="flex justify-between items-center">
@@ -28,6 +46,9 @@ function Dashboard() {
         <div className='grid grid-cols-1 md:grid-cols-3 my-5'>
           <AddNewInterview/>
         </div>
+
+        {/* Previous inyerviews Listed */}
+        <InterviewList />
 
         {interviewList.length == 0 &&
             <EmptyState/>
